@@ -153,7 +153,9 @@ def webull_transaction(wbo: Brokerage, orderObj: stockOrder, loop=None):
                         askList = quote.get("askList", [])
                         bidList = quote.get("bidList", [])
                         if askList == [] and bidList == []:
-                            printAndDiscord(f"{key}: {s} is not available for trading", loop)
+                            printAndDiscord(
+                                f"{key}: {s} is not available for trading", loop
+                            )
                             raise Exception(f"{s} is not available for trading")
                         askPrice = float(askList[0]["price"]) if askList != [] else 0
                         bidPrice = float(bidList[0]["price"]) if bidList != [] else 0
