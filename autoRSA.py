@@ -52,7 +52,6 @@ SUPPORTED_BROKERS = [
     "schwab",
     "tastytrade",
     "tradier",
-    "vanguard",
     "webull",
 ]
 DAY1_BROKERS = [
