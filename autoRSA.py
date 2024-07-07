@@ -52,6 +52,7 @@ SUPPORTED_BROKERS = [
     "schwab",
     "tastytrade",
     "tradier",
+    "vanguard",
     "webull",
 ]
 DAY1_BROKERS = [
@@ -64,6 +65,7 @@ DAY1_BROKERS = [
     "tradier",
     "webull",
 ]
+
 DISCORD_BOT = False
 DOCKER_MODE = False
 DANGER_MODE = False
