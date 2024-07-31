@@ -27,7 +27,7 @@ from helperAPI import (
     printAndDiscord,
     printHoldings,
     stockOrder,
-    type_slowly,
+    type_slowly, getOTPCodeDiscord,
 )
 
 
