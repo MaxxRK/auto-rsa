@@ -238,6 +238,15 @@ def vanguard_transaction(vanguard_o: Brokerage, orderObj: stockOrder, loop=None)
                                 f"{key} account {print_account}: The order verification produced the following messages: {messages['ORDER INVALID']}",
                                 loop,
                             )
+                        if messages["ORDER PREVIEW"] in [
+                            "No order preview page found."
+                        ] or messages["ORDER INVALID"] != [
+                            "No invalid order message found."
+                        ] or messages["ORDER CONFIRMATION"] in [
+                            "No order confirmation page found. Order Failed.",
+                        ]: 
+                            with open("./status/status_store.txt", "a") as f:
+                                f.write(f"{key} account {account} ticker {s}: The order verification was unsuccessful")
             except Exception as e:
                 printAndDiscord(
                     f"{key} {print_account}: Error submitting order: {e}", loop
