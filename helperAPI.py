@@ -526,14 +526,12 @@ def check_if_page_loaded(driver):
 
 
 def getDriver(DOCKER=False):
-    arm_linux = False
+    os_name, arch = None, None
     if sys.platform.startswith("linux"):
         all_info = os.uname()
         os_name = all_info.sysname.lower()
         arch = all_info.machine.lower()
-    if os_name == "linux" and arch == "aarch64":
-        arm_linux = True
-            
+    arm_linux = True if (os_name, arch) == ("linux", "aarch64") else False      
     # Init webdriver options
     try:
         options = webdriver.ChromeOptions()
