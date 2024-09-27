@@ -526,6 +526,14 @@ def check_if_page_loaded(driver):
 
 
 def getDriver(DOCKER=False):
+    arm_linux = False
+    if sys.platform.startswith("linux"):
+        all_info = os.uname()
+        os_name = all_info.sysname.lower()
+        arch = all_info.machine.lower()
+    if os_name == "linux" and arch == "aarch64":
+        arm_linux = True
+            
     # Init webdriver options
     try:
         options = webdriver.ChromeOptions()
@@ -546,7 +554,7 @@ def getDriver(DOCKER=False):
         driver = webdriver.Chrome(
             options=options,
             # Docker uses specific chromedriver installed via apt
-            service=ChromiumService("/usr/bin/chromedriver") if DOCKER else None,
+            service=ChromiumService("/usr/bin/chromedriver") if DOCKER or arm_linux else None,
         )
         stealth(
             driver=driver,
