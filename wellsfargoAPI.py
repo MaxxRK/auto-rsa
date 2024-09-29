@@ -436,7 +436,7 @@ def wellsfargo_transaction(WELLSFARGO_o: Brokerage, orderObj: stockOrder, loop=N
                         order_failed = False
                     elif orderObj.get_dry():
                         printAndDiscord(
-                            f"DRY: {key} account xxxxx{WELLSFARGO_o.get_account_numbers(key)[account]}: {orderObj.get_action()} {orderObj.get_amount()} shares of {s}",
+                            f"DRY: {key} account {WELLSFARGO_o.get_account_numbers(key)[account]}: {orderObj.get_action()} {orderObj.get_amount()} shares of {s}",
                             loop,
                         )
                         order_failed = True
