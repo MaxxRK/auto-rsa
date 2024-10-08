@@ -316,7 +316,7 @@ class FidelityAutomation:
             # Get the last price
             last_price = str(row["Last Price"]).replace("$", "")
             # Get quantity
-            quantity = row["Quantity"]
+            quantity = str(row["Quantity"]).replace("-", "")
             # Get ticker
             ticker = str(row["Symbol"])
 
@@ -331,7 +331,7 @@ class FidelityAutomation:
             # If the last price isn't available, just use the current value
             if len(last_price) == 0:
                 last_price = val
-            # If the quantity is missing, just use 1
+            # If the quantity is missing set it to 1 (SPAXX)
             if len(quantity) == 0:
                 quantity = 1
 

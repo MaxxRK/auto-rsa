@@ -41,7 +41,7 @@ def wellsfargo_init(botObj, WELLSFARGO_EXTERNAL=None, DOCKER=False, loop=None):
 
     if not os.getenv("WELLSFARGO"):
         print("WELLSFARGO environment variable not found.")
-        return False
+        return None
     accounts = (
         os.environ["WELLSFARGO"].strip().split(",")
         if WELLSFARGO_EXTERNAL is None
@@ -121,18 +121,18 @@ def wellsfargo_init(botObj, WELLSFARGO_EXTERNAL=None, DOCKER=False, loop=None):
 
             # TODO: This will not show accounts that do not have settled cash funds
             account_blocks = driver.find_elements(
-                By.CSS_SELECTOR, 'li[data-testid="WELLSTRADE"]'
+                By.CSS_SELECTOR, 'li[data-testid^="WELLSTRADE"]'
             )
             for account_block in account_blocks:
                 masked_number_element = account_block.find_element(
-                    By.CSS_SELECTOR, '[data-testid="WELLSTRADE-masked-number"]'
+                    By.CSS_SELECTOR, '[data-testid$="-masked-number"]'
                 )
                 masked_number_text = masked_number_element.text.replace(".", "*")
                 WELLSFARGO_obj.set_account_number(name, masked_number_text)
                 balance_element = account_block.find_element(
-                    By.CSS_SELECTOR, '[data-testid="WELLSTRADE-balance"]'
+                    By.CSS_SELECTOR, '[data-testid$="-balance"]'
                 )
-                balance = float(balance_element.text.replace("$", ""))
+                balance = float(balance_element.text.replace("$", "").replace(",", ""))
                 WELLSFARGO_obj.set_account_totals(name, masked_number_text, balance)
         except Exception as e:
             wellsfargo_error(driver, e)
