@@ -33,8 +33,9 @@ async def find_brokers():
 
 async def run_command(command: str) -> None:
     """Run a command in the background and display the output in the pre-created dialog."""
-    dialog.open()
     result.content = ''
+    loading[0].content = "Loading..."
+    loading[1].set_visibility(True)
     command = command.replace('python3', sys.executable)  # NOTE replace with machine-independent Python path (#1240)
     process = await asyncio.create_subprocess_exec(
         *shlex.split(command, posix='win' not in sys.platform.lower()),
@@ -50,19 +51,26 @@ async def run_command(command: str) -> None:
         output += new.decode()
         # NOTE the content of the markdown element is replaced every time we have new output
         result.content = f'```\n{output}\n```'
+        loading[0].content = ""
+        loading[1].set_visibility(False)
+        
 
-with ui.dialog() as dialog, ui.card():
+
+with ui.card(), ui.row():
+    loading = ui.markdown(), ui.spinner(size="lg")
     result = ui.markdown()
-
+    
 ui.label('AutoRSA')
 
-with ui.expansion('Brokers found:'):
-    brokers = asyncio.run(find_brokers())
-    for broker in brokers:
-        if broker is not None:
+for broker in asyncio.run(find_brokers()):
+    if broker is not None:
+        with ui.row():
             ui.label(broker)
+            toggle1 = ui.toggle(['Holdings', "Stock Buy", "Stock Sell"], value="Holdings")
+
+
+
 ui.button('python3 autoRSA.py holdings schwab false', on_click=lambda: run_command('python3 autoRSA.py holdings schwab false')).props('no-caps')
-ui.button('python3 autoRSA.py', on_click=lambda: run_command('python3 autoRSA.py')).props('no-caps')
 with ui.row().classes('items-center'):
     ui.button('python3 autoRSA.py "<message>"', on_click=lambda: run_command(f'python3 autoRSA.py "{message.value}"')) \
         .props('no-caps')
