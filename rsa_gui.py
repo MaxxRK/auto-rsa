@@ -8,10 +8,11 @@ import sys
 from dotenv import load_dotenv
 from nicegui import ui
 
+# Initialize .env file
+load_dotenv()
 
 
 async def find_brokers():
-    load_dotenv()
     brokers = []
     brokers.append("BBAE") if os.getenv("BBAE") else None
     brokers.append("Chase") if os.getenv("CHASE") else None
@@ -31,11 +32,11 @@ async def find_brokers():
     brokers.append("Wellsfargo") if os.getenv("WELLSFARGO") else None
     return brokers
 
+    
 async def run_command(command: str) -> None:
     """Run a command in the background and display the output in the pre-created dialog."""
-    result.content = ''
-    loading[0].content = "Loading..."
-    loading[1].set_visibility(True)
+    result.content = 'Loading...'
+    spinner.set_visibility(True)
     command = command.replace('python3', sys.executable)  # NOTE replace with machine-independent Python path (#1240)
     process = await asyncio.create_subprocess_exec(
         *shlex.split(command, posix='win' not in sys.platform.lower()),
@@ -50,31 +51,37 @@ async def run_command(command: str) -> None:
             break
         output += new.decode()
         # NOTE the content of the markdown element is replaced every time we have new output
-        result.content = f'```\n{output}\n```'
-        loading[0].content = ""
-        loading[1].set_visibility(False)
-        
-
-
-with ui.card(), ui.row():
-    loading = ui.markdown(), ui.spinner(size="lg")
-    result = ui.markdown()
+        result.content = f'```\n{output}\n```'""
+        spinner.set_visibility(False)
     
-ui.label('AutoRSA')
+# Enhanced label with styling and an icon
+with ui.row().style('height: 5vh; align-items: center; justify-content: center;'):
+    ui.icon('swap_horiz', color='green', size='lg')
+    ui.label('AutoRSA').style('font-size: 24px; font-weight: bold; color: blue;')
 
-for broker in asyncio.run(find_brokers()):
-    if broker is not None:
+brokers =  asyncio.run(find_brokers())
+holdings = asyncio.run(get_holdings("Firstrade"))
+
+if brokers is not None:
+    with ui.column():
+        toggle1 = ui.toggle(brokers, value=brokers[0])
         with ui.row():
-            ui.label(broker)
-            toggle1 = ui.toggle(['Holdings', "Stock Buy", "Stock Sell"], value="Holdings")
-
-
-
-ui.button('python3 autoRSA.py holdings schwab false', on_click=lambda: run_command('python3 autoRSA.py holdings schwab false')).props('no-caps')
-with ui.row().classes('items-center'):
-    ui.button('python3 autoRSA.py "<message>"', on_click=lambda: run_command(f'python3 autoRSA.py "{message.value}"')) \
-        .props('no-caps')
-    message = ui.input('message', value='NiceGUI')
+            toggle2 = ui.toggle(['Holdings', "Stock Buy", "Stock Sell"], value="Holdings")
+        with ui.row():
+            ui.button('Run Holdings', on_click=lambda: run_command(f'python3 autoRSA.py {toggle2.value} {toggle1.value} false')).props('no-caps')
+        with ui.row():
+            message = ui.input('Ticker')
+            message_two = ui.input('Quantity')
+        with ui.row():
+            ui.button("Run Dry Stock Buy", on_click=lambda: run_command(f'python3 autoRSA.py buy {message_two.value} {message.value} {toggle1.value} true')).props('no-caps')
+            ui.button("Run Stock Buy", on_click=lambda: run_command(f'python3 autoRSA.py buy {message_two.value} {message.value} {toggle1.value} false')).props('no-caps')
+        with ui.row():
+            ui.button("Run Dry Stock Sell", on_click=lambda: run_command(f'python3 autoRSA.py sell {message_two.value} {message.value} {toggle1.value} true')).props('no-caps')
+            ui.button("Run Stock Sell", on_click=lambda: run_command(f'python3 autoRSA.py sell {message_two.value} {message.value} {toggle1.value}')).props('no-caps')
+    
+with ui.card(), ui.row():
+    result, spinner = ui.markdown(), ui.spinner(size="lg")
+    spinner.set_visibility(False)
 
 # NOTE: On Windows reload must be disabled to make asyncio.create_subprocess_exec work (see https://github.com/zauberzeug/nicegui/issues/486)
 ui.run(reload=platform.system() != 'Windows')
