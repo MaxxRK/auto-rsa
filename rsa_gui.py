@@ -8,9 +8,17 @@ import sys
 from dotenv import load_dotenv
 from nicegui import ui
 
+class InputValues:
+    def __init__(self):
+        self.buy_ticker = ""
+        self.buy_quantity = ""
+        self.sell_ticker = ""
+        self.sell_quantity = ""
+
 # Initialize .env file
 load_dotenv()
-
+   
+    
 
 async def find_brokers():
     brokers = []
@@ -37,6 +45,7 @@ async def run_command(command: str) -> None:
     """Run a command in the background and display the output in the pre-created dialog."""
     result.content = 'Loading...'
     spinner.set_visibility(True)
+    print(command)
     command = command.replace('python3', sys.executable)  # NOTE replace with machine-independent Python path (#1240)
     process = await asyncio.create_subprocess_exec(
         *shlex.split(command, posix='win' not in sys.platform.lower()),
@@ -52,32 +61,42 @@ async def run_command(command: str) -> None:
         output += new.decode()
         # NOTE the content of the markdown element is replaced every time we have new output
         result.content = f'```\n{output}\n```'""
-        spinner.set_visibility(False)
-    
+    spinner.set_visibility(False)
+    return output
+
+async def create_broker_table(command: str):
+    output = await run_command(command)
+    print(output)
+
 # Enhanced label with styling and an icon
 with ui.row().style('height: 5vh; align-items: center; justify-content: center;'):
     ui.icon('swap_horiz', color='green', size='lg')
     ui.label('AutoRSA').style('font-size: 24px; font-weight: bold; color: blue;')
 
 brokers =  asyncio.run(find_brokers())
-holdings = asyncio.run(get_holdings("Firstrade"))
 
 if brokers is not None:
+    input_values = InputValues()
     with ui.column():
         toggle1 = ui.toggle(brokers, value=brokers[0])
         with ui.row():
             toggle2 = ui.toggle(['Holdings', "Stock Buy", "Stock Sell"], value="Holdings")
-        with ui.row():
+        with ui.row().bind_visibility_from(toggle2, 'value', value="Holdings"):
             ui.button('Run Holdings', on_click=lambda: run_command(f'python3 autoRSA.py {toggle2.value} {toggle1.value} false')).props('no-caps')
-        with ui.row():
-            message = ui.input('Ticker')
-            message_two = ui.input('Quantity')
-        with ui.row():
-            ui.button("Run Dry Stock Buy", on_click=lambda: run_command(f'python3 autoRSA.py buy {message_two.value} {message.value} {toggle1.value} true')).props('no-caps')
-            ui.button("Run Stock Buy", on_click=lambda: run_command(f'python3 autoRSA.py buy {message_two.value} {message.value} {toggle1.value} false')).props('no-caps')
-        with ui.row():
-            ui.button("Run Dry Stock Sell", on_click=lambda: run_command(f'python3 autoRSA.py sell {message_two.value} {message.value} {toggle1.value} true')).props('no-caps')
-            ui.button("Run Stock Sell", on_click=lambda: run_command(f'python3 autoRSA.py sell {message_two.value} {message.value} {toggle1.value}')).props('no-caps')
+        with ui.row().bind_visibility_from(toggle2, 'value', value="Stock Buy"):
+            ui.input(label='Ticker', placeholder='Enter Ticker', on_change=lambda e: setattr(input_values, "buy_ticker", e.value))
+            ui.input(label='Quantity', placeholder='Enter Quantity', on_change=lambda e: setattr(input_values, "buy_quantity", e.value))
+        with ui.row().bind_visibility_from(toggle2, 'value', value="Stock Sell"):
+            ui.input(label='Ticker', placeholder='Enter Ticker', on_change=lambda e: setattr(input_values, "sell_ticker", e.value))
+            ui.input(label='Quantity', placeholder='Enter Quantity', on_change=lambda e: setattr(input_values, "sell_quantity", e.value))
+        
+        with ui.row().bind_visibility_from(toggle2, 'value', value="Stock Buy"):
+            ui.button("Run Dry Stock Buy", on_click=lambda: run_command(f'python3 autoRSA.py buy {input_values.buy_quantity} {input_values.buy_ticker} {toggle1.value} true')).props('no-caps')
+            ui.button("Run Stock Buy", on_click=lambda: run_command(f'python3 autoRSA.py buy {input_values.buy_quantity} {input_values.buy_ticker} {toggle1.value} false')).props('no-caps')
+    
+        with ui.row().bind_visibility_from(toggle2, 'value', value="Stock Sell"):
+            ui.button("Run Dry Stock Sell", on_click=lambda: run_command(f'python3 autoRSA.py sell {input_values.sell_quantity} {input_values.sell_ticker} {toggle1.value} true')).props('no-caps')
+            ui.button("Run Stock Sell", on_click=lambda: run_command(f'python3 autoRSA.py sell {input_values.sell_quantity} {input_values.sell_ticker} {toggle1.value} false')).props('no-caps')
     
 with ui.card(), ui.row():
     result, spinner = ui.markdown(), ui.spinner(size="lg")
