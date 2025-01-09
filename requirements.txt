@@ -8,7 +8,7 @@ fennel-invest-api==1.1.2
 fidelity-api==0.0.8
 firstrade==0.0.30
 GitPython==3.1.44
-nodriver==0.38.post1
+nodriver==0.38
 # Plynk API
 -e git+https://github.com/MaxxRK/Plynk-API.git@f3558dd2825e9b92d7d8daa9b1d4af40271e02e0#egg=plynk_api
 # playwright stealth from pypi seems abandoned
