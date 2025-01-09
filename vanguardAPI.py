@@ -142,7 +142,7 @@ def vanguard_transaction(vanguard_o: Brokerage, orderObj: stockOrder, loop=None)
     print()
     # load env
     load_dotenv()
-    purchase_accounts = os.environ["VG_ACCOUNT_NUMBERS"].split(",")
+    purchase_accounts = os.environ["VG_ACCOUNT_NUMBERS"].split(":")
     # Buy on all accounts unless specified accounts are given in .env
     for s in orderObj.get_stocks():
         for key in vanguard_o.get_account_numbers():

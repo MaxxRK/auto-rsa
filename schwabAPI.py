@@ -89,7 +89,7 @@ def schwab_transaction(schwab_o: Brokerage, orderObj: stockOrder, loop=None):
     print()
     # load env
     load_dotenv()
-    purchase_accounts = os.environ["SCHWAB_ACCOUNT_NUMBERS"].split(",")
+    purchase_accounts = os.environ["SCHWAB_ACCOUNT_NUMBERS"].split(":")
     # Buy on all accounts unless specified accounts are given in .env
     for s in orderObj.get_stocks():
         for key in schwab_o.get_account_numbers():
