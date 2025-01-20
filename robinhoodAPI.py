@@ -4,7 +4,6 @@
 import os
 import traceback
 
-import pyotp
 import robin_stocks.robinhood as rh
 from dotenv import load_dotenv
 
@@ -19,7 +18,7 @@ def login_with_cache(pickle_path, pickle_name):
     )
 
 
-def robinhood_init(ROBINHOOD_EXTERNAL=None):
+def robinhood_init(ROBINHOOD_EXTERNAL=None, botObj=None, loop=None):
     # Initialize .env file
     load_dotenv()
     # Import Robinhood account
@@ -37,15 +36,13 @@ def robinhood_init(ROBINHOOD_EXTERNAL=None):
     for account in RH:
         index = RH.index(account) + 1
         name = f"Robinhood {index}"
-        print(f"Logging in to {name}...")
+        printAndDiscord(f"Logging in to {name}...", loop)
+        printAndDiscord(f"{name}: Check phone app for verification prompt. You have ~60 seconds.", loop)
         try:
             account = account.split(":")
             rh.login(
                 username=account[0],
                 password=account[1],
-                mfa_code=(
-                    None if account[2].upper() == "NA" else pyotp.TOTP(account[2]).now()
-                ),
                 store_session=True,
                 expiresIn=86400 * 30,  # 30 days
                 pickle_path="./creds/",
