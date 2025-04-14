@@ -32,7 +32,6 @@ try:
         stockOrder,
         updater,
     )
-    from plynkAPI import *
     from publicAPI import *
     from robinhoodAPI import *
     from schwabAPI import *
@@ -60,7 +59,6 @@ SUPPORTED_BROKERS = [
     "fennel",
     "fidelity",
     "firstrade",
-    "plynk",
     "public",
     "robinhood",
     "schwab",
@@ -146,7 +144,6 @@ def fun_run(orderObj: stockOrder, command, botObj=None, loop=None):
                     "dspac",
                     "fennel",
                     "firstrade",
-                    "plynk",
                     "public",
                     "robinhood",
                 ]:
