@@ -542,7 +542,14 @@ def getDriver(DOCKER=False):
         all_info = os.uname()
         os_name = all_info.sysname.lower()
         arch = all_info.machine.lower()
-    arm_linux = True if (os_name, arch) == ("linux", "aarch64") else False      
+    arm_linux = True if (os_name, arch) == ("linux", "aarch64") else False
+    # Find out if we are on arch linux
+    try:
+        with open("/etc/os-release") as f:
+            os_info = f.read().lower()
+        is_arch = "arch" in os_info
+    except FileNotFoundError:
+        is_arch = False
     # Init webdriver options
     try:
         options = webdriver.ChromeOptions()
@@ -563,7 +570,8 @@ def getDriver(DOCKER=False):
         driver = webdriver.Chrome(
             options=options,
             # Docker uses specific chromedriver installed via apt
-            service=ChromiumService("/usr/bin/chromedriver") if DOCKER or arm_linux else None,
+            # Arch seems to be behind in driver versions so must use the latest in aur intalled on system.
+            service=ChromiumService("/usr/bin/chromedriver") if DOCKER or arm_linux or is_arch else None,
         )
         stealth(
             driver=driver,
