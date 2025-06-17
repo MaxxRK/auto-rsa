@@ -188,12 +188,12 @@ def vanguard_transaction(vanguard_o: Brokerage, orderObj: stockOrder, loop=None)
                                 f"{key} account {print_account}: Buying 26 then selling 25 of {s}",
                                 loop,
                             )
-                            dance_quantity = 2
+                            dance_quantity = 26
                         elif i == 0 and transaction_length == 1:
                             dance_quantity = int(orderObj.get_amount())
                         else:
                             
-                            dance_quantity = 1
+                            dance_quantity = 25
                             order_type = order.OrderSide.SELL
                             sleep(20)
                             obj.page.reload()
