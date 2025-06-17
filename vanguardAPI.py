@@ -5,6 +5,7 @@ import asyncio
 import os
 import pprint
 import traceback
+from time import sleep
 
 from dotenv import load_dotenv
 from vanguard import account as vg_account
@@ -153,7 +154,8 @@ def vanguard_transaction(vanguard_o: Brokerage, orderObj: stockOrder, loop=None)
                     print_account = maskString(account)
                     if (
                         purchase_accounts != [""]
-                        and orderObj.get_action().lower() != "sell"
+                        # removing this for now as sell is not needed for more than what is specified in env
+                        # and orderObj.get_action().lower() != "sell"
                         and str(account) not in purchase_accounts
                     ):
                         print(
@@ -186,12 +188,15 @@ def vanguard_transaction(vanguard_o: Brokerage, orderObj: stockOrder, loop=None)
                                 f"{key} account {print_account}: Buying 26 then selling 25 of {s}",
                                 loop,
                             )
-                            dance_quantity = 26
+                            dance_quantity = 2
                         elif i == 0 and transaction_length == 1:
                             dance_quantity = int(orderObj.get_amount())
                         else:
-                            dance_quantity = 25
+                            
+                            dance_quantity = 1
                             order_type = order.OrderSide.SELL
+                            sleep(20)
+                            obj.page.reload()
                         messages = vg_order.place_order(
                             account_id=account,
                             quantity=dance_quantity,
