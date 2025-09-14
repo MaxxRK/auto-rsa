@@ -4,7 +4,8 @@ chaseinvest-api==0.3.2
 curl_cffi==0.7.4
 discord.py==2.5.2
 dspac_invest_api==0.1.3
-fennel-invest-api==1.2.0
+#fennel-invest-api==1.2.0
+-e git+https://github.com/NelsonDane/fennel-invest-api.git@034f7b3c220bb242a438c544c85c37a1fc816abd#egg=fennel-invest-api
 fidelity-api==0.0.12
 firstrade==0.0.33
 GitPython==3.1.45
