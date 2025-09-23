@@ -68,7 +68,6 @@ def fennel_init(FENNEL_EXTERNAL=None, botObj=None, loop=None):
             for i, an in enumerate(account_ids):
                 account_name = f"Account {i + 1}"
                 b = fb.get_portfolio_summary(an)
-                print(b)
                 fennel_obj.set_account_number(name, account_name)
                 if "message" in b:
                     b=0.0
@@ -76,7 +75,7 @@ def fennel_init(FENNEL_EXTERNAL=None, botObj=None, loop=None):
                 fennel_obj.set_account_totals(
                     name,
                     account_name,
-                    0.0,
+                    b,
                 )
                 fennel_obj.set_logged_in_object(name, an, account_name)
                 print(f"Found {account_name}")
