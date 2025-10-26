@@ -286,11 +286,12 @@ Note: You *must* turn on Real-time quotes in Account->Real-time quotes in order 
 Made by yours truly using [public-invest-api](https://github.com/NelsonDane/public-invest-api). Consider giving me a ⭐
 
 Required `.env` variables:
-- `PUBLIC_USERNAME`
-- `PUBLIC_PASSWORD`
+- `PUBLIC_API_KEY`
 
 `.env` file format:
-- `PUBLIC_BROKER=PUBLIC_USERNAME:PUBLIC_PASSWORD`
+- `PUBLIC_BROKER=PUBLIC_API_KEY`
+
+Generate a Public API key [here](https://public.com/settings/v2/security/api).
 
 Note: Because Windows already has a `PUBLIC` environment variable, you will need to use `PUBLIC_BROKER` instead.
 
