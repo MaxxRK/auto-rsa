@@ -1,18 +1,44 @@
 # Nelson Dane
 # Script to automate RSA stock purchases
 
+
 # Import libraries
 import asyncio
+import importlib.util
 import os
 import sys
 import traceback
+import warnings
 from importlib.metadata import version
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from src.helper_api import is_up_to_date
 
 if TYPE_CHECKING:
     from src.helper_api import Brokerage
+
+
+# Filter out old playwright warning: temporary
+warnings.filterwarnings(
+    "ignore",
+    message="pkg_resources is deprecated as an API",
+    category=UserWarning,
+)
+warnings.filterwarnings(
+    "ignore",
+    message="SyntaxWarning: 'continue' in a 'finally' block",
+    category=SyntaxWarning,
+)
+
+# Point "robin_stocks" to the actual inner folder. Workaround until package update
+vendor_root = Path(__file__).resolve().parent / "vendors" / "robin_stocks" / "robin_stocks"
+spec = importlib.util.spec_from_file_location("robin_stocks", vendor_root / "__init__.py")
+if spec is not None:
+    robin_stocks = importlib.util.module_from_spec(spec)
+    sys.modules["robin_stocks"] = robin_stocks
+    if spec.loader is not None:
+        spec.loader.exec_module(robin_stocks)
 
 # Print Startup Info
 print(f"Python version: {sys.version}")
