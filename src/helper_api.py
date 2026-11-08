@@ -14,7 +14,7 @@ from io import BytesIO
 from queue import Queue
 from threading import Thread
 from time import sleep
-from typing import Any, Literal, TypedDict, TypeVar, cast
+from typing import Any, Literal, TypedDict, cast
 
 import requests
 from discord.ext import commands
@@ -61,7 +61,7 @@ class NonEmbedType(TypedDict):
 task_queue: Queue[tuple[str | EmbedType, bool]] = Queue()
 
 
-class StockOrder:  # noqa: PLR0904
+class StockOrder:  # ruff: ignore[too-many-public-methods]
     """Object representing a stock order."""
 
     def __init__(self) -> None:
@@ -91,10 +91,6 @@ class StockOrder:  # noqa: PLR0904
     def set_stock(self, stock: str) -> None:
         """Set the stock ticker to buy/sell."""
         self.__stock.append(stock.upper())
-
-    def set_time(self, time: Literal["day", "gtc"]) -> None:
-        """Set the time in force for the order."""
-        self.__time = time
 
     def set_price(self, price: Literal["market", "limit"] | float) -> None:
         """Set the price for the order."""
@@ -224,9 +220,6 @@ class StockOrder:  # noqa: PLR0904
                 Logged In: {self.__logged_in}"
 
 
-T = TypeVar("T")
-
-
 class Brokerage:
     """Object representing all logins and accounts at a brokerage."""
 
@@ -241,13 +234,9 @@ class Brokerage:
             str,
             Any,
         ] = {}  # Dictionary of logged in objects under parent
-        self.__holdings: dict = {}  # Dictionary of holdings under parent
+        self.__holdings: dict[str, dict[str, dict[str, dict[str, float]]]] = {}  # Dictionary of holdings under parent
         self.__account_totals: dict = {}  # Dictionary of account totals
         self.__account_types: dict = {}  # Dictionary of account types
-
-    def set_name(self, name: str) -> None:
-        """Set the name of the brokerage."""
-        self.__name = name
 
     def set_account_number(self, parent_name: str, account_number: str) -> None:
         """Set the account number for a specific parent."""
@@ -397,7 +386,7 @@ class Brokerage:
 class ThreadHandler:
     """Thread manager for running brokerage functions."""
 
-    def __init__(self, func: Callable, *args: Any, **kwargs: Any) -> None:  # noqa: ANN401
+    def __init__(self, func: Callable, *args: Any, **kwargs: Any) -> None:  # ruff: ignore[any-type]
         """Initialize the thread handler."""
         self.func = func
         self.args = args
@@ -563,7 +552,7 @@ async def process_discord_messages(
         success = False
         while success is False:
             try:
-                response = requests.post(  # noqa: ASYNC210
+                response = requests.post(  # ruff: ignore[blocking-http-call-in-async-function]
                     DISCORD_MESSAGES_URL,
                     headers=headers,
                     json=payload,
@@ -572,7 +561,7 @@ async def process_discord_messages(
                 # Process response
                 if response.ok:
                     success = True
-                elif response.status_code == 429:  # noqa: PLR2004
+                elif response.status_code == 429:  # ruff: ignore[magic-value-comparison]
                     rate_limit = response.json()["retry_after"] * 2
                     await asyncio.sleep(rate_limit)
                 else:
@@ -613,7 +602,7 @@ async def get_otp_from_discord(
     bot_obj: commands.Bot,
     broker_name: str,
     code_len: int = 6,
-    timeout: int = 60,  # noqa: ASYNC109
+    timeout: int = 60,  # ruff: ignore[async-function-with-timeout]
     loop: asyncio.AbstractEventLoop | None = None,
 ) -> str | None:
     """Wait for a user-input OTP code from Discord."""
@@ -656,7 +645,7 @@ async def get_otp_from_discord(
 async def get_input_from_discord(
     bot_obj: commands.Bot,
     prompt: str,
-    timeout: int = 60,  # noqa: ASYNC109
+    timeout: int = 60,  # ruff: ignore[async-function-with-timeout]
     loop: asyncio.AbstractEventLoop | None = None,
 ) -> str | None:
     """Wait for user input from Discord."""
@@ -688,7 +677,7 @@ async def send_captcha_to_discord(file: BytesIO) -> None:
     files = {"file": ("captcha.png", file, "image/png")}
     success = False
     while not success:
-        response = requests.post(  # noqa: ASYNC210
+        response = requests.post(  # ruff: ignore[blocking-http-call-in-async-function]
             DISCORD_MESSAGES_URL,
             headers=headers,
             files=files,
@@ -696,7 +685,7 @@ async def send_captcha_to_discord(file: BytesIO) -> None:
         )
         if response.ok:
             success = True
-        elif response.status_code == 429:  # noqa: PLR2004
+        elif response.status_code == 429:  # ruff: ignore[magic-value-comparison]
             rate_limit = response.json()["retry_after"] * 2
             await asyncio.sleep(rate_limit)
         else:

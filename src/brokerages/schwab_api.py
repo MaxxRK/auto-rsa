@@ -43,8 +43,12 @@ def schwab_init() -> Brokerage | None:
                 totp_secret=None if account[2] == "NA" else account[2],
             )
 
-            # Use the older get_account_info() function which correctly fetches all accounts
-            account_info = schwab.get_account_info()
+            # Try the new endpoint then fallback to the old one
+            try:
+                account_info = schwab.get_account_info_v2()
+            except Exception as e:
+                print(f"Error occurred while fetching account info v2: {e}")
+                account_info = schwab.get_account_info()
 
             if not account_info:
                 msg = f"{name}: Failed to retrieve account information from Schwab."
@@ -86,7 +90,7 @@ def schwab_holdings(schwab_o: Brokerage, loop: AbstractEventLoop | None = None) 
     print_all_holdings(schwab_o, loop)
 
 
-def schwab_transaction(schwab_o: Brokerage, order_obj: StockOrder, loop: AbstractEventLoop | None = None) -> None:  # noqa: C901
+def schwab_transaction(schwab_o: Brokerage, order_obj: StockOrder, loop: AbstractEventLoop | None = None) -> None:  # ruff: ignore[complex-structure]
     """Handle Schwab API transactions."""
     print()
     print("==============================")

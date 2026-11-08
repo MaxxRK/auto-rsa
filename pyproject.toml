@@ -6,44 +6,46 @@ requires-python = ">=3.12"
 dependencies = [
     "bbae-invest-api==0.1.5",
     "chaseinvest-api==0.4.7",
-    "cryptography>=46.0.3",
-    "curl-cffi==0.15.0",
+    "curl-cffi>=0.16.2",
     "discord-py==2.7.1",
     "dspac-invest-api==0.1.4",
     "email-validator>=2.3.0",
     "fennel-invest-api==2.0.1",
-    "fidelity-api==0.0.16",
-    "firstrade==0.0.38",
-    "nodriver==0.47.0",
-    "paho-mqtt>=2.1.0",
-    "publicdotcom-py==0.1.18",
-    "pyotp==2.10.0",
-    "python-dotenv==1.2.2",
-    "pytz>=2025.2",
-    "requests==2.33.1",
-    "schwab-api2>=0.3.0",
-    "selenium-stealth==1.0.6",
-    "setuptools<84",
-    "tastytrade==12.4.1",
+    "fidelity-api==0.0.17",
+    "firstrade==0.0.39",
+    "nodriver==0.47.0", # pinned until https://github.com/ultrafunkamsterdam/nodriver/pull/36 gets merged
+    "publicdotcom-py==0.1.27",
+    "pyotp>=2.10.0",
+    "python-dotenv>=1.2.3",
+    "requests>=2.34.2",
+    "robin_stocks@git+https://github.com/NelsonDane/robin_stocks_v2@1ba446970f7bac5c4c0ac96390ae9e3f7a9b9d0e",
+    "schwab-api2==0.3.0",
+    "selenium>=4.38.0",
+    "selenium-stealth>=1.0.6",
+    "tastytrade==12.4.3",
     "typer>=0.20.0",
     "vanguard-api==0.3.3",
+    "webull@git+https://github.com/NelsonDane/webull@ef14ae63f9e1436fbea77fe864df54847cf2f730",
 ]
 
 [dependency-groups]
 dev = [
+    "deptry>=0.25.1",
     "ruff>=0.13.3",
     "ty>=0.0.11",
     "types-requests>=2.32.4.20250913",
+    "vulture>=2.16",
 ]
 
 [project.scripts]
 auto_rsa_bot = "src.cli:app"
+auto-rsa-bot = "src.cli:app"
 
 [tool.uv]
 package = true
 
 [build-system]
-requires = ["uv_build>=0.11.7,<0.12.0"]
+requires = ["uv_build>=0.13.5,<0.14.0"]
 build-backend = "uv_build"
 
 [tool.uv.build-backend]
@@ -54,7 +56,7 @@ module-root = "."
 target-version = "py312"
 extend = "./styles/ruff.toml"
 include = ["src/*"]
-exclude = ["src/vendors/*", "docs/*"]
+exclude = ["docs/*"]
 
 [tool.ruff.lint]
 ignore = [
@@ -64,6 +66,7 @@ ignore = [
     "TRY301",  # Allow raising exceptions
     "DOC201",  # Don't require returns in doc
     "DOC501",  # Don't require raises in doc
+    "PLW0717", # Login/order flows intentionally wrap large blocks in try/except
 ]
 [tool.ruff.lint.per-file-ignores]
 "src/brokerages/*" = [
@@ -76,4 +79,16 @@ root = ["src"]
 python-version = "3.12"
 
 [tool.ty.src]
-exclude = ["src/vendors/*", "docs/*"]
+exclude = ["docs/*", "vulture_whitelist.py"]
+
+[tool.deptry]
+exclude = [
+    "docs",
+    ".venv",
+    "tests",
+    "vulture_whitelist.py"
+]
+
+[tool.vulture]
+min_confidence = 60
+paths = ["src", "vulture_whitelist.py"]

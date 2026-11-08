@@ -8,9 +8,9 @@ from asyncio import AbstractEventLoop
 from typing import Any, cast
 
 from dotenv import load_dotenv
+from robin_stocks import robinhood as rh
 
 from src.helper_api import Brokerage, StockOrder, mask_string, print_all_holdings, print_and_discord
-from src.vendors.robin_stocks.robin_stocks import robinhood as rh
 
 
 def login_with_cache(pickle_path: str, pickle_name: str) -> None:
@@ -101,7 +101,7 @@ def robinhood_holdings(rho: Brokerage, loop: AbstractEventLoop | None = None) ->
     print_all_holdings(rho, loop)
 
 
-def robinhood_transaction(rho: Brokerage, order_obj: StockOrder, loop: AbstractEventLoop | None = None) -> None:  # noqa: C901, PLR0912
+def robinhood_transaction(rho: Brokerage, order_obj: StockOrder, loop: AbstractEventLoop | None = None) -> None:  # ruff: ignore[complex-structure, too-many-branches]
     """Handle Robinhood API transactions."""
     print()
     print("==============================")
